@@ -37,8 +37,8 @@ export const getUserById = async (req: Request, res: Response, next: NextFunctio
 export const createUser = async (req: Request, res: Response, next: NextFunction) => {
 
   try {
-    const { password, email, rolId } = req.body;
-    const newUser = await UserService.create(password, email, rolId);
+    const { password, email, rolId, lastName, name } = req.body;
+    const newUser = await UserService.create(password, email, name, lastName, rolId);
     logger.info(`Created new user with id: ${newUser.id}`);
     res.status(201).json({ success: true, data: newUser });
   } catch (error) {
