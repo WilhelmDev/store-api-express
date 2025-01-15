@@ -11,6 +11,38 @@ services:
       - "5432:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
+    networks:
+      - store-network
+      - store-frontend-network
 
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: store-api
+    ports:
+      - "8000:8000"
+    depends_on:
+      - postgres
+    environment:
+      DATABASE_URL: postgresql://storeuser:storepassword@postgres:5432/storedb
+      PORT: 8000
+    networks:
+      - store-network
+      - store-frontend-network
+    deploy:
+      resources:
+        limits:
+          cpus: '0.50'
+          memory: 512M
+        reservations:
+          cpus: '0.25'
+          memory: 256M
+
+networks:
+  store-network:
+    driver: bridge
+  store-frontend-network:
+    external: true
 volumes:
   postgres_data:
