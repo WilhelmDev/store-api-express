@@ -26,6 +26,7 @@ model User {
   storeId   Int?
   store     Store?    @relation(fields: [storeId], references: [id])
   invoices  Invoice[]
+  avatar    String?
 }
 
 model Store {
@@ -48,6 +49,14 @@ model Product {
   updatedAt            DateTime               @updatedAt
   inventoryTransaction InventoryTransaction[]
   invoiceItems         InvoiceItem[]
+  images               ProductImage[]
+}
+
+model ProductImage {
+  id        Int      @id @default(autoincrement())
+  url       String
+  productId Int
+  product   Product  @relation(fields: [productId], references: [id])
 }
 
 model InventoryTransaction {

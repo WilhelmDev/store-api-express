@@ -13,36 +13,26 @@ services:
       - postgres_data:/var/lib/postgresql/data
     networks:
       - store-network
-      - store-frontend-network
 
-  api:
-    build:
-      context: .
-      dockerfile: Dockerfile
-    container_name: store-api
-    ports:
-      - "8000:8000"
-    depends_on:
-      - postgres
+  minio:
+    image: minio/minio
+    container_name: store-api-minio
     environment:
-      DATABASE_URL: postgresql://storeuser:storepassword@postgres:5432/storedb
-      PORT: 8000
+      MINIO_ROOT_USER: minioadmin
+      MINIO_ROOT_PASSWORD: minioadmin
+    ports:
+      - "9000:9000"
+      - "9001:9001"
+    volumes:
+      - minio_data:/data
+    command: server /data --console-address ":9001"
     networks:
       - store-network
-      - store-frontend-network
-    deploy:
-      resources:
-        limits:
-          cpus: '0.50'
-          memory: 512M
-        reservations:
-          cpus: '0.25'
-          memory: 256M
 
 networks:
   store-network:
     driver: bridge
-  store-frontend-network:
-    external: true
+
 volumes:
   postgres_data:
+  minio_data:
