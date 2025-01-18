@@ -20,6 +20,13 @@ class ProductService {
     return products;
   }
 
+  async getByCategory(categoryId: number) {
+    const products = await prisma.product.findMany({
+      where: { categoryId },
+    })
+    return products;
+  }
+
   async create(name: string, price: number, storeId: number, categoryId: number) {
     const product = await prisma.product.create({
       data: {
