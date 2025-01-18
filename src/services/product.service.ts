@@ -20,13 +20,16 @@ class ProductService {
     return products;
   }
 
-  async create(name: string, price: number, storeId: number) {
+  async create(name: string, price: number, storeId: number, categoryId: number) {
     const product = await prisma.product.create({
       data: {
         name,
         price,
         store: {
           connect: { id: storeId }
+        },
+        category: {
+          connect: { id: categoryId }
         }
       }
     })
