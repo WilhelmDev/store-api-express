@@ -34,6 +34,7 @@ model Store {
   name      String    @unique
   employees User[]
   products  Product[]
+  categories Category[]
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt
   invoices  Invoice[]
@@ -43,9 +44,13 @@ model Category {
   id        Int       @id @default(autoincrement())
   name      String    @unique
   color     String
+  storeId   Int
+  store     Store     @relation(fields: [storeId], references: [id])
   products  Product[]
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt
+
+  @@unique([name, storeId])
 }
 
 model Product {

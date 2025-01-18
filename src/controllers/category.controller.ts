@@ -1,6 +1,7 @@
 import { Request, Response, NextFunction} from 'express';
 import CategoryService from '../services/category.service';
 import logger, { logError } from '../utils/logger';
+import UserService from '../services/user.service';
 
 export const getAllCategories = async (req: Request, res: Response, next: NextFunction) => {
   try {
@@ -37,7 +38,20 @@ export const createCategory = async (req: Request, res: Response, next: NextFunc
   try {
     const { name, color } = req.body;
 
-    const newCategory = await CategoryService.create(name, color);
+    if (!req.userId) {
+      res.status(401).json({ success: false, message: 'Unauthorized' });
+      return;
+    }
+
+    const user = await UserService.getById(+req.userId);
+
+    if (!user ||!user.storeId) {
+      logger.error(`User not found with ID: ${req.userId}`);
+      res.status(404).json({ success: false, message: 'User not found' });
+      return;
+    }
+
+    const newCategory = await CategoryService.create(name, color, user.storeId);
 
     logger.info(`Created new category with id: ${newCategory.id}`);
     res.status(201).json({ success: true, data: newCategory });
@@ -47,6 +61,7 @@ export const createCategory = async (req: Request, res: Response, next: NextFunc
     res.status(400).json({ success: false, message: 'Invalid category data' });
   }
 }
+
 
 export const updateCategory = async (req: Request, res: Response, next: NextFunction) => {
   try {

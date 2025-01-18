@@ -1,5 +1,6 @@
 import { Router } from 'express';
 import { createCategory, deleteCategory, getAllCategories, getCategoryById, updateCategory } from '../controllers/category.controller';
+import { authMiddleware } from '../middlewares/auth.middleware';
 
 const router = Router();
 
@@ -14,6 +15,7 @@ router.route('/:id')
 
 router.post(
   '/create',
+  [ authMiddleware ],
   createCategory
 )
 

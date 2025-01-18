@@ -15,11 +15,12 @@ class CategoryService {
     const category = await prisma.category.findUnique({ where: { name } })
     return category
   }
-  async create(name: string, color: string) {
+  async create(name: string, color: string, storeId: number) {
     const category = await prisma.category.create({
       data: {
         name,
-        color
+        color,
+        store: { connect: { id: storeId } }
       }
     })
     return category
