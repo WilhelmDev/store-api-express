@@ -1,6 +1,7 @@
 import { Request, Response, NextFunction} from 'express';
 import UserService from '../services/user.service';
 import logger, { logError } from '../utils/logger';
+import StoreService from '../services/store.service';
 
 export const getAllUsers = async (req: Request, res: Response, next: NextFunction) => {
 
@@ -37,8 +38,16 @@ export const getUserById = async (req: Request, res: Response, next: NextFunctio
 export const createUser = async (req: Request, res: Response, next: NextFunction) => {
 
   try {
-    const { password, email, rolId } = req.body;
-    const newUser = await UserService.create(password, email, rolId);
+    const { password, email, rolId, lastName, name, storeId } = req.body;
+
+    const store = await StoreService.getById(+storeId);
+    if (!store) {
+      logger.warn(`Store with id ${storeId} not found`);
+      res.status(404).json({ success: false, message: 'Store not found' });
+      return
+    }
+
+    const newUser = await UserService.create(password, email, name, lastName, rolId, storeId);
     logger.info(`Created new user with id: ${newUser.id}`);
     res.status(201).json({ success: true, data: newUser });
   } catch (error) {

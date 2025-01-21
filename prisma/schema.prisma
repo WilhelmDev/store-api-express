@@ -14,11 +14,115 @@ model Role {
 }
 
 model User {
-  id        Int      @id @default(autoincrement())
-  email     String   @unique
+  id        Int       @id @default(autoincrement())
+  email     String    @unique
+  name      String
+  lastName  String
   password  String
   roleId    Int
-  role      Role     @relation(fields: [roleId], references: [id])
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  role      Role      @relation(fields: [roleId], references: [id])
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  storeId   Int?
+  store     Store?    @relation(fields: [storeId], references: [id])
+  invoices  Invoice[]
+  avatar    String?
+}
+
+model Store {
+  id        Int       @id @default(autoincrement())
+  name      String    @unique
+  employees User[]
+  products  Product[]
+  categories Category[]
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  invoices  Invoice[]
+}
+
+model Category {
+  id        Int       @id @default(autoincrement())
+  name      String    @unique
+  color     String
+  storeId   Int
+  store     Store     @relation(fields: [storeId], references: [id])
+  products  Product[]
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+
+  @@unique([name, storeId])
+}
+
+model Product {
+  id                   Int                    @id @default(autoincrement())
+  name                 String                 @unique
+  price                Float
+  storeId              Int
+  store                Store                  @relation(fields: [storeId], references: [id])
+  categoryId           Int
+  category             Category             @relation(fields: [categoryId], references: [id])
+  createdAt            DateTime               @default(now())
+  updatedAt            DateTime               @updatedAt
+  inventoryTransaction InventoryTransaction[]
+  invoiceItems         InvoiceItem[]
+  images               ProductImage[]
+}
+
+model ProductImage {
+  id        Int      @id @default(autoincrement())
+  url       String
+  productId Int
+  product   Product  @relation(fields: [productId], references: [id])
+}
+
+model InventoryTransaction {
+  id            Int             @id @default(autoincrement())
+  productId     Int
+  product       Product         @relation(fields: [productId], references: [id])
+  quantity      Int
+  type          TransactionType
+  description   String?
+  invoiceItemId Int?
+  invoiceItem   InvoiceItem?    @relation(fields: [invoiceItemId], references: [id])
+  createdAt     DateTime        @default(now())
+  updatedAt     DateTime        @updatedAt
+}
+
+enum TransactionType {
+  PURCHASE
+  SALE
+  ADJUSTMENT
+  RETURN
+}
+
+model Invoice {
+  id            Int           @id @default(autoincrement())
+  invoiceNumber String        @unique
+  userId        Int
+  user          User          @relation(fields: [userId], references: [id])
+  storeId       Int
+  store         Store         @relation(fields: [storeId], references: [id])
+  totalAmount   Float
+  status        InvoiceStatus
+  items         InvoiceItem[]
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
+}
+
+model InvoiceItem {
+  id                    Int                    @id @default(autoincrement())
+  invoiceId             Int
+  invoice               Invoice                @relation(fields: [invoiceId], references: [id])
+  productId             Int
+  product               Product                @relation(fields: [productId], references: [id])
+  quantity              Int
+  unitPrice             Float
+  subtotal              Float
+  inventoryTransactions InventoryTransaction[]
+}
+
+enum InvoiceStatus {
+  PENDING
+  PAID
+  CANCELLED
 }

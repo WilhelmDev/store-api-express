@@ -21,7 +21,7 @@ class UserService  {
     return user;
   }
 
-  create = async (password: string, email: string, rolId: number) => {
+  create = async (password: string, email: string, name:string, lastName:string, rolId: number, storeId: number) => {
     const hashedPassword = await bcrypt.hash(password, 10);
     const role = await prisma.role.findUnique({ where: { id: rolId } });
 
@@ -30,9 +30,14 @@ class UserService  {
     const newUser = await prisma.user.create({
       data: {
         email,
+        name,
+        lastName,
         password: hashedPassword,
         role: {
           connect: { id: rolId }
+        },
+        store: {
+          connect: { id: storeId }
         }
       }
     });

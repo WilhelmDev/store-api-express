@@ -4,17 +4,20 @@ import UserService from '../services/user.service';
 export const authMiddleware = (req: Request, res: Response, next: NextFunction) => {
   const authHeader = req.headers.authorization;
   if (!authHeader) {
-    return res.status(401).json({ success: false, message: 'No token provided' });
+    res.status(401).json({ success: false, message: 'No token provided' });
+    return;
   }
 
   const parts = authHeader.split(' ');
   if (parts.length !== 2) {
-    return res.status(401).json({ success: false, message: 'Token error' });
+    res.status(401).json({ success: false, message: 'Token error' });
+    return;
   }
 
   const [scheme, token] = parts;
   if (!/^Bearer$/i.test(scheme)) {
-    return res.status(401).json({ success: false, message: 'Token malformatted' });
+    res.status(401).json({ success: false, message: 'Token malformatted' });
+    return;
   }
 
   try {
@@ -22,6 +25,7 @@ export const authMiddleware = (req: Request, res: Response, next: NextFunction) 
     req.userId = decoded.userId;
     next();
   } catch (error) {
-    return res.status(401).json({ success: false, message: 'Invalid token' });
+    res.status(401).json({ success: false, message: 'Invalid token' });
+    return;
   }
 };
