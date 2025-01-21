@@ -42,3 +42,29 @@ export const getProductById = async (req: Request, res: Response, next: NextFunc
     res.status(500).json({ success: false, message: 'Server error' });
   }
 }
+
+export const createProduct = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const userId = req.userId as string;
+    const user = await UserService.getById(+userId);
+    if (!user ||!user.storeId) {
+      logger.error(`User not found with ID: ${userId}`);
+      res.status(404).json({ success: false, message: 'User not found' });
+      return;
+    }
+    const { name, price, categoryId } = req.body;
+    if (!name ||!price ||!categoryId) {
+      logger.error('Missing required fields');
+      res.status(400).json({ success: false, message: 'Missing required fields' });
+      return;
+    }
+    const product = await ProductService.create(name, price, user.storeId, categoryId);
+    logger.info(`Created new product with id: ${product.id}`);
+    res.status(201).json({ success: true, data: product });
+    return
+  } catch (error) {
+    logError(error as Error);
+    res.status(500).json({ success: false, message: 'Server error' });
+    return;
+  }
+}
