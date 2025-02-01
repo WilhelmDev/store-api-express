@@ -37,8 +37,16 @@ class ImageService {
   }
 
   private getImageUrl(objectName: string): string {
-    return `${process.env.MINIO_ENDPOINT}/${this.bucketName}/${objectName}`;
+    const protocol = process.env.MINIO_USE_SSL === 'true' ? 'https' : 'http';
+    const endpoint = process.env.MINIO_ENDPOINT || 'localhost';
+    const port = process.env.MINIO_PORT || '9000';
+
+    // Si el puerto es 80 (HTTP) o 443 (HTTPS), no lo incluimos en la URL
+    const portString = (port === '80' || port === '443') ? '' : `:${port}`;
+
+    return `${protocol}://${endpoint}${portString}/${this.bucketName}/${objectName}`;
   }
+
 
   async initializeBucket(): Promise<void> {
     const bucketExists = await this.minioClient.bucketExists(this.bucketName);

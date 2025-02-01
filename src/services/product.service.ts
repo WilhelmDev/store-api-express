@@ -1,4 +1,5 @@
 import { PrismaClient } from '@prisma/client'
+import { imageService } from './image.service'
 
 const prisma = new PrismaClient()
 
@@ -16,8 +17,9 @@ class ProductService {
   async getByStore(storeId: number) {
     const products = await prisma.product.findMany({
       where: { storeId },
+      include: { images: true }
     })
-    return products;
+    return products.map((product) => ({...product, images: product.images.map((image) => ({ ...image, url: imageService.getProductImageUrl(image.url)})) }));
   }
 
   async getByCategory(categoryId: number) {
