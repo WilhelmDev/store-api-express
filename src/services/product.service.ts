@@ -8,8 +8,8 @@ class ProductService {
     return products
   }
 
-  async getById(id: number) {
-    const product = await prisma.product.findUnique({ where: { id } })
+  async getById(id: number, includeImages: boolean = true) {
+    const product = await prisma.product.findUnique({ where: { id }, include: { images: Boolean(includeImages) } })
     return product
   }
 
@@ -49,6 +49,15 @@ class ProductService {
       data: { name, price },
     })
     return updatedProduct;
+  }
+
+  async addImage(productId: number, imageUrl: string) {
+    return await prisma.productImage.create({
+      data: {
+        url: imageUrl,
+        productId: productId,
+      },
+    });
   }
 }
 
