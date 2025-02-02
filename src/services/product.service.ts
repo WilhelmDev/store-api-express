@@ -11,7 +11,7 @@ class ProductService {
 
   async getById(id: number,) {
     const product = await prisma.product.findUnique({ where: { id }, include: { images: true, category:true } })
-    if (product) {
+    if (product && product.images) {
       product.images = product.images.map((image) => ({...image, url: imageService.getProductImageUrl(image.url)}))
     }
     return product
