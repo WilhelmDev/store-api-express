@@ -9,15 +9,15 @@ class ProductService {
     return products
   }
 
-  async getById(id: number, includeImages: boolean = true) {
-    const product = await prisma.product.findUnique({ where: { id }, include: { images: Boolean(includeImages) } })
+  async getById(id: number,) {
+    const product = await prisma.product.findUnique({ where: { id }, include: { images: true, category:true } })
     return product
   }
 
   async getByStore(storeId: number) {
     const products = await prisma.product.findMany({
       where: { storeId },
-      include: { images: true }
+      include: { images: true, category:true }
     })
     return products.map((product) => ({...product, images: product.images.map((image) => ({ ...image, url: imageService.getProductImageUrl(image.url)})) }));
   }
