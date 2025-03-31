@@ -11,6 +11,11 @@ class CartService {
             product: true
           }
         }
+      },
+      omit: {
+        createdAt: true,
+        updatedAt: true,
+        userId: true
       }
     })
     return cart

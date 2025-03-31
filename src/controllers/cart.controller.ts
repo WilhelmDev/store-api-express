@@ -4,8 +4,8 @@ import logger, { logError } from '../utils/logger';
 
 export const getCart = async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const userId = parseInt(req.params.userId);
-    const cart = await CartService.getCart(userId);
+    const userId = req.userId as string;
+    const cart = await CartService.getCart(parseInt(userId));
     logger.info(`Cart retrieved for user ${userId}`);
     res.json({ success: true, data: cart });
   } catch (error) {
@@ -16,8 +16,9 @@ export const getCart = async (req: Request, res: Response, next: NextFunction) =
 
 export const addToCart = async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const { userId, productId, quantity } = req.body;
-    const cartItem = await CartService.addToCart(userId, productId, quantity);
+    const { productId, quantity } = req.body;
+    const userId = req.userId as string;
+    const cartItem = await CartService.addToCart(parseInt(userId), productId, quantity);
     logger.info(`Product ${productId} added to cart for user ${userId}`);
     res.status(201).json({ success: true, data: cartItem });
   } catch (error) {
