@@ -27,6 +27,7 @@ model User {
   store     Store?    @relation(fields: [storeId], references: [id])
   invoices  Invoice[]
   avatar    String?
+  cart      Cart?
 }
 
 model Store {
@@ -66,6 +67,7 @@ model Product {
   inventoryTransaction InventoryTransaction[]
   invoiceItems         InvoiceItem[]
   images               ProductImage[]
+  CartItem CartItem[]
 }
 
 model ProductImage {
@@ -125,4 +127,26 @@ enum InvoiceStatus {
   PENDING
   PAID
   CANCELLED
+}
+
+model Cart {
+  id        Int         @id @default(autoincrement())
+  userId    Int         @unique
+  user      User        @relation(fields: [userId], references: [id])
+  items     CartItem[]
+  createdAt DateTime    @default(now())
+  updatedAt DateTime    @updatedAt
+}
+
+model CartItem {
+  id        Int      @id @default(autoincrement())
+  cartId    Int
+  cart      Cart     @relation(fields: [cartId], references: [id])
+  productId Int
+  product   Product  @relation(fields: [productId], references: [id])
+  quantity  Int
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([cartId, productId])
 }
