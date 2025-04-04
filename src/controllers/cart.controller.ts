@@ -29,9 +29,9 @@ export const addToCart = async (req: Request, res: Response, next: NextFunction)
 
 export const removeFromCart = async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const userId = parseInt(req.params.userId);
+    const userId = req.userId as string;
     const productId = parseInt(req.params.productId);
-    await CartService.removeFromCart(userId, productId);
+    await CartService.removeFromCart(+userId, productId);
     logger.info(`Product ${productId} removed from cart for user ${userId}`);
     res.status(204).json({ success: true, data: null});
   } catch (error) {

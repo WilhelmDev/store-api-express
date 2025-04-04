@@ -1,4 +1,5 @@
 import { PrismaClient } from '@prisma/client'
+import { imageService } from './image.service'
 const prisma = new PrismaClient()
 
 class CartService {
@@ -8,7 +9,12 @@ class CartService {
       include: {
         items: {
           include: {
-            product: true
+            product: {
+              include: {
+                images: true,
+                category: true
+              }
+            }
           }
         }
       },
@@ -18,6 +24,10 @@ class CartService {
         userId: true
       }
     })
+    if (cart) {
+      const updatedProducts = cart?.items.map((item) => ({...item, product: {...item.product, images: item.product.images.map((image) => ({...image, url: imageService.getProductImageUrl(image.url)})) } }))
+      cart.items = updatedProducts
+    }
     return cart
   }
 
